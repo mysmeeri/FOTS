@@ -10,13 +10,17 @@ parameters:
     - test
     - prod
 
+steps:
+- checkout: self
+
 variables:
 - ${{ if eq(parameters.environment, 'dev') }}:
-  - template: infra/variables/dev/infra-variables.yml
+  - template: ../infra/variables/dev/infra-variables.yml
 - ${{ if eq(parameters.environment, 'test') }}:
-  - template: infra/variables/test/infra-variables.yml
+  - template: ../infra/variables/test/infra-variables.yml
 - ${{ if eq(parameters.environment, 'prod') }}:
-  - template: infra/variables/prod/infra-variables.yml
+  - template: ../infra/variables/prod/infra-variables.yml
+
 
 pool: 
   name: Default 
@@ -46,20 +50,8 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          $env = '${{ parameters.environment }}'
-          $basePath = "$(Build.SourcesDirectory)"
-          $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
-
-          Write-Host "Reading parameters from $paramFile"
-
-          if (-Not (Test-Path $paramFile)) {
-            Write-Error "Parameter file not found: $paramFile"
-            exit 1
-          }
-
-          $params = Get-Content $paramFile | ConvertFrom-Json
-          Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
-          Write-Host "##vso[task.setvariable variable=location]$($params.location)"
+          Write-Host "RG Name: $(resourceGroup)"
+          Write-Host "Location: $(location)"
 
     - task: AzurePowerShell@5
       displayName: 'Tsekataan if RG exists if not Deploy'
@@ -67,8 +59,9 @@ stages:
         azureSubscription: 'FOTS-infra-SC'
         ScriptType: 'InlineScript'
         Inline: |
-          $rgName = ${{ variables.resourceGroup }}
-          $location = "${{ variables.location }}
+          $rgName = "$(resourceGroup)"
+          $location = "$(location)"
+
 
           Write-Host "Checking if RG '$rgName' exists..."
 
