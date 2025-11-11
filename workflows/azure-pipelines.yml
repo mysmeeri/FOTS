@@ -28,7 +28,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
- - checkout: none
+- checkout: none
 
 - script: |
     echo "Running test pipeline..."
