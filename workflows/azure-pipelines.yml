@@ -1,0 +1,10 @@
+#TODO
+# build - osa
+# ?????
+#
+# deploy resources
+# - ohtaa yhteyden azureen
+# - service connectionilla -> tälle pitää laittaa tarpeeksi paukkuja subiin että saa deployattua mitään
+# - valitsee environmentin käyttäjän valinnan mukaan
+# - deploy rg if not exists
+# - check if resources already exists, if not, deploy
