@@ -1,16 +1,3 @@
-#TODO
-# build - osa
-# ?????
-#
-# deploy resources
-# - ohtaa yhteyden azureen
-# - service connectionilla -> tälle pitää laittaa tarpeeksi paukkuja subiin että saa deployattua mitään
-# - valitsee environmentin käyttäjän valinnan mukaan
-# - deploy rg if not exists
-# - check if resources already exists, if not, deploy
-
-
-
 trigger: none
 
 parameters:
@@ -25,13 +12,66 @@ parameters:
 
 
 pool: 
-  name: Default
+  name: Default 
 
-steps:
-- checkout: none
+stages: 
+- stage: Validate
+  displayName: "Validate"
+  jobs:
+  - job: ValidateInfra
+    displayName: "Placeholder for validation logic"
+    steps:
+    - checkout: self
+    - script: echo "Validation would happen here if I had more time"
+      displayName: "Skip validation (for now)"
 
-- script: |
-    echo "Running test pipeline..."
-    echo "Selected environment: ${{ parameters.environment }}"
-    echo "Hello from the Azure Pipelines agent!"
-  displayName: 'Test print task'
+- stage: Deploy
+  displayName: 'Deploy Infrastructure to Azure'
+  dependsOn: Validate
+  condition: succeeded()
+  
+  variables:
+  - ${{ if eq(parameters.environment, 'dev') }}:
+    - template: ../infra/variables/dev/infra-variables.yml
+  - ${{ if eq(parameters.environment, 'test') }}:
+    - template: ../infra/variables/test/infra-variables.yml
+  - ${{ if eq(parameters.environment, 'prod') }}:
+    - template: ../infra/variables/prod/infra-variables.yml
+
+  jobs:
+  - job: DeployInfra
+    steps:
+    - checkout: self
+
+    - task: PowerShell@2
+      displayName: 'Loading parameters...'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "RG Name: $(resourceGroup)"
+          Write-Host "Location: $(location)"
+
+    - task: AzurePowerShell@5
+      displayName: 'Tsekataan if RG exists if not Deploy'
+      inputs:
+        azureSubscription: 'FOTS-infra-SC'
+        ScriptType: 'InlineScript'
+        Inline: |
+          $rgName = "$(resourceGroup)"
+          $location = "$(location)"
+
+
+          Write-Host "Checking if RG '$rgName' exists..."
+
+          $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
+
+          if ($rg) {
+            Write-Host "Resource group '$rgName' already exists. Skipping creation."
+          }
+#           else {
+#            Write-Host "Creating resource group '$rgName'..."
+#            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
+#              Creation = 'IaC'
+#              }
+#          }
+        AzurePowerShellVersion: 'LatestVersion'
