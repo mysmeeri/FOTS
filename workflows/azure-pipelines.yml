@@ -30,6 +30,10 @@ pool:
 steps:
 - checkout: self
 
+- script: dir "$(Build.SourcesDirectory)\infra\dev"
+  displayName: 'List files in dev folder'
+
+
 - task: PowerShell@2
   displayName: 'Parametritestailua'
   inputs:
