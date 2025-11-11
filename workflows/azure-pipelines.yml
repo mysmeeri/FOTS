@@ -2,7 +2,7 @@ trigger: none
 
 parameters:
 - name: environment
-  displayName: 'Select env'
+  displayName: "Select env"
   type: string
   default: dev
   values:
@@ -10,68 +10,72 @@ parameters:
     - test
     - prod
 
-pool: 
-  name: Default 
+variables:
+- template: infra/parameters/$env/infra-variables.yml
 
-stages: 
+pool:
+name: Default
+
+stages:
 - stage: Validate
   displayName: "Validate"
   jobs:
-  - job: ValidateInfra
-    displayName: "Placeholder for validation logic"
-    steps:
-    - checkout: self
-    - script: echo "Validation would happen here if I had more time"
-      displayName: "Skip validation (for now)"
+    - job: ValidateInfra
+      displayName: "Placeholder for validation logic"
+      steps:
+        - checkout: self
+        - script: echo "Validation would happen here if I had more time"
+          displayName: "Skip validation (for now)"
 
 - stage: Deploy
-  displayName: 'Deploy Infrastructure to Azure'
+  displayName: "Deploy Infrastructure to Azure"
   dependsOn: Validate
   condition: succeeded()
   jobs:
-  - job: DeployInfra
-    steps:
-    - checkout: self
+    - job: DeployInfra
+      steps:
+        - checkout: self
 
-    - task: PowerShell@2
-      displayName: 'Loading parameters...'
-      inputs:
-        targetType: 'inline'
-        script: |
-          $env = '${{ parameters.environment }}'
-          $basePath = "$(Build.SourcesDirectory)"
-          $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
+        - task: PowerShell@2
+          displayName: "Loading parameters..."
+          inputs:
+            targetType: "inline"
+            script: |
+              $env = '${{ parameters.environment }}'
+              $basePath = "$(Build.SourcesDirectory)"
+              $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
 
-          Write-Host "Reading parameters from $paramFile"
+              Write-Host "Reading parameters from $paramFile"
 
-          if (-Not (Test-Path $paramFile)) {
-            Write-Error "Parameter file not found: $paramFile"
-            exit 1
-          }
-
-          $params = Get-Content $paramFile | ConvertFrom-Json
-          Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
-          Write-Host "##vso[task.setvariable variable=location]$($params.location)"
-
-    - task: AzurePowerShell@5
-      displayName: 'Tsekataan if RG exists if not Deploy'
-      inputs:
-        azureSubscription: 'FOTS-infra-SC'
-        ScriptType: 'InlineScript'
-        Inline: |
-          $rgName = "$(rgName)"
-          $location = "$(location)"
-
-          Write-Host "Checking if RG '$rgName' exists..."
-
-          $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
-
-          if ($rg) {
-            Write-Host "Resource group '$rgName' already exists. Skipping creation."
-          } else {
-            Write-Host "Creating resource group '$rgName'..."
-            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
-              Creation = 'IaC'
+              if (-Not (Test-Path $paramFile)) {
+                Write-Error "Parameter file not found: $paramFile"
+                exit 1
               }
-          }
-        AzurePowerShellVersion: 'LatestVersion'
+
+              $params = Get-Content $paramFile | ConvertFrom-Json
+              Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
+              Write-Host "##vso[task.setvariable variable=location]$($params.location)"
+
+        - task: AzurePowerShell@5
+          displayName: "Tsekataan if RG exists if not Deploy"
+          inputs:
+            azureSubscription: "FOTS-infra-SC"
+            ScriptType: "InlineScript"
+            Inline: |
+              $rgName = ${{ variables.resourceGroup }}
+              $location = "${{ variables.location }}
+
+              Write-Host "Checking if RG '$rgName' exists..."
+
+              $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
+
+              if ($rg) {
+                Write-Host "Resource group '$rgName' already exists. Skipping creation."
+              }
+            #           else {
+            #            Write-Host "Creating resource group '$rgName'..."
+            #            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
+            #              Creation = 'IaC'
+            #              }
+            #          }
+            AzurePowerShellVersion: "LatestVersion"
