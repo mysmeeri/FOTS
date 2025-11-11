@@ -30,7 +30,7 @@ pool:
 steps:
 - checkout: self
 
-- script: dir "$(Build.SourcesDirectory)\infra\dev"
+- script: dir "$(Build.SourcesDirectory)\infra\parameters\dev"
   displayName: 'List files in dev folder'
 
 
@@ -41,7 +41,7 @@ steps:
     script: |
       $env = '${{ parameters.environment }}'
       $basePath = "$(Build.SourcesDirectory)"
-      $paramFile = Join-Path -Path $basePath -ChildPath "infra/$env/infra-config.json"
+      $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
 
       Write-Host "Reading parameters from $paramFile"
 
