@@ -25,13 +25,25 @@ parameters:
 
 
 pool: 
-  name: Default
+  name: Default 
 
 steps:
-- checkout: none
+- checkout: self
 
-- script: |
-    echo "Running test pipeline..."
-    echo "Selected environment: ${{ parameters.environment }}"
-    echo "Hello from the Azure Pipelines agent!"
-  displayName: 'Test print task'
+- task: PowerShell@2
+  displayName: 'Load Parameters from JSON'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $env = '${{ parameters.environment }}'
+      $paramFile = "infra/$env/infra-config.json"
+      Write-Host "Reading parameters from $paramFile"
+
+      $params = Get-Content $paramFile | ConvertFrom-Json
+      $rgName = $params.resourceGroup
+      $location = $params.location
+
+      Write-Host "Resource Group: $rgName"
+      Write-Host "Location: $location"
+
+      

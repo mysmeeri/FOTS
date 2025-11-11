@@ -1,1 +1,4 @@
-placeholder
+{ 
+    "resourceGroup": "my-test-dev-rg",
+    "location": "westeurope"
+}
