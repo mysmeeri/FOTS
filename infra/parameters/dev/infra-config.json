@@ -1,4 +1,4 @@
 { 
-    "resourceGroup": "my-test-dev-rg",
+    "resourceGroup": "FOTS-dev-RG",
     "location": "westeurope"
 }

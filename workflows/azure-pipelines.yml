@@ -30,12 +30,9 @@ pool:
 steps:
 - checkout: self
 
-- script: dir "$(Build.SourcesDirectory)\infra\parameters\dev"
-  displayName: 'List files in dev folder'
-
 
 - task: PowerShell@2
-  displayName: 'Parametritestailua'
+  displayName: 'Loading parameters....'
   inputs:
     targetType: 'inline'
     script: |
@@ -51,8 +48,18 @@ steps:
       }
 
       $params = Get-Content $paramFile | ConvertFrom-Json
-      $rgName = $params.resourceGroup
-      $location = $params.location
+      # Set pipeline variables
+      Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
+      Write-Host "##vso[task.setvariable variable=location]$($params.location)"
 
       Write-Host "Resource Group: $rgName"
       Write-Host "Location: $location"
+
+
+- task: PowerShell@2
+  displayName: 'Tsekataan if RG exists if not Deploy'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Checking if RG $rgName exists..."
+
