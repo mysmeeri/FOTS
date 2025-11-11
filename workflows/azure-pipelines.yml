@@ -61,18 +61,19 @@ stages:
         Inline: |
           $rgName = "$(rgName)"
           $location = "$(location)"
-          Write-Host "Checking if RG $rgName exists..."
 
-          $rg = az group show --name $rgName --output json 2>$null
+          Write-Host "Checking if RG '$rgName' exists..."
 
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "Resource group '$rgName' exists. Proceeding with deployment..."
-            # Add deployment logic here
+          $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
+
+          if ($rg) {
+            Write-Host "Resource group '$rgName' already exists. Skipping creation."
+          } else {
+            Write-Host "Creating resource group '$rgName'..."
+            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
+              Creation = 'IaC'
+              }
           }
-          else {
-            Write-Host "Resource group '$rgName' does not exist. Creating..."
-            az group create --name $rgName --location $location
-          }
-          
+
     azurePowerShellVersion: 'LatestVersion'
     pwsh: true
