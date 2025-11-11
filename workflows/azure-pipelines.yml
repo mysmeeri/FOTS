@@ -12,7 +12,7 @@ parameters:
 
 
 variables:
-- template: infra/parameters/$env/infra-variables.yml
+- template: infra/variables/$env/infra-variables.yml
 
 pool: 
   name: Default 
