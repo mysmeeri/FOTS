@@ -61,5 +61,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      Write-Host "Checking if RG $rgName exists..."
+      Write-Host "Checking if RG $(rgName) exists..."
 
+      $rgName = "$(rgName)"
+      $location = "$(location)"
