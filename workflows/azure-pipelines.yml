@@ -31,13 +31,20 @@ steps:
 - checkout: self
 
 - task: PowerShell@2
-  displayName: 'Load Parameters from JSON'
+  displayName: 'Parametritestailua'
   inputs:
     targetType: 'inline'
     script: |
       $env = '${{ parameters.environment }}'
-      $paramFile = "infra/$env/infra-config.json"
+      $basePath = "$(Build.SourcesDirectory)"
+      $paramFile = Join-Path -Path $basePath -ChildPath "infra/$env/infra-config.json"
+
       Write-Host "Reading parameters from $paramFile"
+
+      if (-Not (Test-Path $paramFile)) {
+        Write-Error "Parameter file not found: $paramFile"
+        exit 1
+      }
 
       $params = Get-Content $paramFile | ConvertFrom-Json
       $rgName = $params.resourceGroup
@@ -45,5 +52,3 @@ steps:
 
       Write-Host "Resource Group: $rgName"
       Write-Host "Location: $location"
-
-      
