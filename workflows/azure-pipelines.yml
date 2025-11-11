@@ -74,6 +74,3 @@ stages:
               Creation = 'IaC'
               }
           }
-
-    azurePowerShellVersion: 'LatestVersion'
-    pwsh: true
