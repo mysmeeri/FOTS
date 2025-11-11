@@ -25,7 +25,7 @@ parameters:
 
 
 pool: 
-  vmImage: 'ubuntu-latest'
+  name: Default
 
 steps:
 - checkout: none
