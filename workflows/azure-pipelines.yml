@@ -8,3 +8,30 @@
 # - valitsee environmentin käyttäjän valinnan mukaan
 # - deploy rg if not exists
 # - check if resources already exists, if not, deploy
+
+
+
+trigger: none
+
+parameters:
+- name: environment
+  displayName: 'Select env'
+  type: string
+  default: dev
+  values:
+    - dev
+    - test
+    - prod
+
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+steps:
+ - checkout: none
+
+- script: |
+    echo "Running test pipeline..."
+    echo "Selected environment: ${{ parameters.environment }}"
+    echo "Hello from the Azure Pipelines agent!"
+  displayName: 'Test print task'
