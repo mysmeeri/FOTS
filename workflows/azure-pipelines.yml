@@ -1,16 +1,3 @@
-#TODO
-# build - osa
-# ?????
-#
-# deploy resources
-# - ohtaa yhteyden azureen
-# - service connectionilla -> tälle pitää laittaa tarpeeksi paukkuja subiin että saa deployattua mitään
-# - valitsee environmentin käyttäjän valinnan mukaan
-# - deploy rg if not exists
-# - check if resources already exists, if not, deploy
-
-
-
 trigger: none
 
 parameters:
@@ -23,45 +10,65 @@ parameters:
     - test
     - prod
 
-
 pool: 
   name: Default 
 
-steps:
-- checkout: self
+stages: 
+- stage: Validate
+  displayName: "Validating"
+  jobs:
+  - job: ValidateInfra
+    displayName: "Placeholder for validation logic"
+    steps:
+    - checkout: self
+    - script: echo "Validation would happen here if I had more time"
+      displayName: "Skip validation (for now)"
 
+- stage: Deploy
+  displayName: 'Deploy Infrastructure to Azure'
+  dependsOn: Validate
+  condition: succeeded()
+  jobs:
+  - job: DeployInfra
+    steps:
+    - checkout: self
 
-- task: PowerShell@2
-  displayName: 'Loading parameters....'
-  inputs:
-    targetType: 'inline'
-    script: |
-      $env = '${{ parameters.environment }}'
-      $basePath = "$(Build.SourcesDirectory)"
-      $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
+    - task: PowerShell@2
+      displayName: 'Loading parameters....'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $env = '${{ parameters.environment }}'
+          $basePath = "$(Build.SourcesDirectory)"
+          $paramFile = Join-Path -Path $basePath -ChildPath "infra/parameters/$env/infra-config.json"
 
-      Write-Host "Reading parameters from $paramFile"
+          Write-Host "Reading parameters from $paramFile"
 
-      if (-Not (Test-Path $paramFile)) {
-        Write-Error "Parameter file not found: $paramFile"
-        exit 1
-      }
+          if (-Not (Test-Path $paramFile)) {
+            Write-Error "Parameter file not found: $paramFile"
+            exit 1
+          }
 
-      $params = Get-Content $paramFile | ConvertFrom-Json
-      # Set pipeline variables
-      Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
-      Write-Host "##vso[task.setvariable variable=location]$($params.location)"
+          $params = Get-Content $paramFile | ConvertFrom-Json
+          Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
+          Write-Host "##vso[task.setvariable variable=location]$($params.location)"
 
-      Write-Host "Resource Group: $rgName"
-      Write-Host "Location: $location"
+    - task: PowerShell@2
+      displayName: 'Tsekataan if RG exists if not Deploy'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $rgName = "$(rgName)"
+          $location = "$(location)"
+          Write-Host "Checking if RG $rgName exists..."
 
+          $rg = az group show --name $rgName --output json 2>$null
 
-- task: PowerShell@2
-  displayName: 'Tsekataan if RG exists if not Deploy'
-  inputs:
-    targetType: 'inline'
-    script: |
-      Write-Host "Checking if RG $(rgName) exists..."
-
-      $rgName = "$(rgName)"
-      $location = "$(location)"
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Resource group '$rgName' exists. Proceeding with deployment..."
+            # Add deployment logic here
+          }
+          else {
+            Write-Host "Resource group '$rgName' does not exist. Creating..."
+            az group create --name $rgName --location $location
+          }
