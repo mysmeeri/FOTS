@@ -53,11 +53,12 @@ stages:
           Write-Host "##vso[task.setvariable variable=rgName]$($params.resourceGroup)"
           Write-Host "##vso[task.setvariable variable=location]$($params.location)"
 
-    - task: PowerShell@2
+    - task: AzurePowerShell@5
       displayName: 'Tsekataan if RG exists if not Deploy'
       inputs:
-        targetType: 'inline'
-        script: |
+        azureSubscription: 'FOTS-infra-SC'
+        ScriptType: 'InlineScript'
+        Inline: |
           $rgName = "$(rgName)"
           $location = "$(location)"
           Write-Host "Checking if RG $rgName exists..."
@@ -72,3 +73,6 @@ stages:
             Write-Host "Resource group '$rgName' does not exist. Creating..."
             az group create --name $rgName --location $location
           }
+          
+    azurePowerShellVersion: 'LatestVersion'
+    pwsh: true
