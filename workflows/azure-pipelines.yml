@@ -15,7 +15,7 @@ pool:
 
 stages: 
 - stage: Validate
-  displayName: "Validating"
+  displayName: "Validate"
   jobs:
   - job: ValidateInfra
     displayName: "Placeholder for validation logic"
@@ -34,7 +34,7 @@ stages:
     - checkout: self
 
     - task: PowerShell@2
-      displayName: 'Loading parameters....'
+      displayName: 'Loading parameters...'
       inputs:
         targetType: 'inline'
         script: |
@@ -74,3 +74,5 @@ stages:
               Creation = 'IaC'
               }
           }
+        AzurePowerShellVersion: 'LatestVersion'
+        pwsh: true
