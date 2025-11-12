@@ -37,7 +37,7 @@ stages:
           - task: AzurePowerShell@5
             displayName: "Check if RG exists if not Deploy"
             inputs:
-              azureSubscription: "FOTS-infra-SC"
+              azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
               ScriptType: "InlineScript"
               Inline: |
                 $env = '${{ parameters.environment }}'
@@ -71,3 +71,14 @@ stages:
         displayName: "Deploy resources to all RGs"
         steps:
           - checkout: self
+
+          #pseudokoodia
+          - task: ACLI
+            displayName: "Deploy App Service"
+            inputs:
+              azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
+              ScriptType: "InlineScript"
+              Inline: |
+                az group create --name myResourceGroup --location "southcentralus" &&
+                az deployment group create --resource-group myResourceGroup --template-file <path-to-template>
+

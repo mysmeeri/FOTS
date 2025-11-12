@@ -1,9 +1,16 @@
 // **************** PARAMETERS *********************** //
 
+@description('The name of the Web App')
+param webAppName string
 
-var param = json(loadTextContent('../variables/dev/parameters.json'))
+@description('App Service Plan SKU')
+param sku string
 
-var settings = param
+@description('Runtime stack for the Web App (Linux)')
+param linuxFxVersion string
+
+@description('Deployment location')
+param location string = resourceGroup().location
 
 // **** demo-rg **** /
 
@@ -13,3 +20,12 @@ var settings = param
 // **** FOTS-app-dev-rg **** /
 
 
+module appService '../modules/AppServiceForPython.bicep' = {
+  name: 'deployAppService'
+  params: {
+    webAppName: webAppName
+    sku: sku
+    linuxFxVersion: linuxFxVersion
+    location: location
+  }
+}
