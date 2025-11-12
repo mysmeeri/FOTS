@@ -27,8 +27,8 @@ stages:
 
   - stage: Deploy
     displayName: "Deploying Infra to Azure"
-    dependsOn: Validate
-    condition: succeeded()
+#    dependsOn: Validate
+#    condition: succeeded()
 
     jobs:
       - job: DeployInfra
@@ -42,6 +42,7 @@ stages:
               scriptLocation: "inlineScript"
               inlineScript: |
                 az deployment sub create `
+                  --location westeurope `
                   --template-file infra/main.bicep `
                   --parameters @infra/variables/${{ parameters.environment }}/infra-var.json
 
