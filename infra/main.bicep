@@ -1,17 +1,17 @@
 param rgName string
 param location string
 param environment string
-/*param appServicePlanName string
-param sku object*/
 
 module rgModule './modules/ResourceGroup.bicep' = {
   name: 'deployRG'
+  scope: subscription() // make the scope explicit
   params: {
     rgName: rgName
     location: location
-    environment: environment()
+    environment: environment // you missed this one
   }
 }
+
 
 /**module aspModule './modules/AppServicePlan.bicep' = {
   name: 'deployASP'
