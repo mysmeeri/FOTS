@@ -64,14 +64,13 @@ stages:
 
 - stage: Deploy Resources 
   display name: Deploy Resources
-
   jobs: 
   - job: Deploy into Resourcegroups
-  steps: 
-  - checkout: self
-
-  -task: AzurePowerShell@5
-  displayName: 'PlaceHolder'
-  ScriptType: 'InlineScript'
-  Inline: |
-    Write-Host "TESTETSTETTETSTETS"
+    steps: 
+    - checkout: self
+    - task: AzurePowerShell@5
+      displayName: 'PlaceHolder'
+      inputs:
+        ScriptType: 'InlineScript'
+        Inline: |
+          Write-Host "TESTETSTETTETSTETS"
