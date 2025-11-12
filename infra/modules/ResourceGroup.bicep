@@ -7,6 +7,6 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
   tags: {
     Environment: environment
-    CreatedWith: MeerinIacPipeline
+    CreatedWith: 'MeerinIacPipeline'
   }
 }
