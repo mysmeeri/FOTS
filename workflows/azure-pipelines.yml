@@ -1,64 +1,73 @@
 trigger: none
 
 parameters:
-- name: environment
-  displayName: 'Select env'
-  type: string
-  default: dev
-  values:
-    - dev
-    - test
-    - prod
+  - name: environment
+    displayName: "Select env"
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
 
+pool:
+  name: Default
 
-pool: 
-  name: Default 
+stages:
+  - stage: Validate
+    displayName: "Validate"
+    jobs:
+      - job: ValidateInfra
+        displayName: "Placeholder for validation logic"
+        steps:
+          - checkout: self
+          - script: echo "Validation would happen here if I had more time"
+            displayName: "Skip validation (for now)"
 
-stages: 
-- stage: Validate
-  displayName: "Validate"
-  jobs:
-  - job: ValidateInfra
-    displayName: "Placeholder for validation logic"
-    steps:
-    - checkout: self
-    - script: echo "Validation would happen here if I had more time"
-      displayName: "Skip validation (for now)"
+  - stage: DeployRG
+    displayName: "Deploy ResourceGroups to Azure"
+    dependsOn: Validate
+    condition: succeeded()
 
-- stage: DeployRG
-  displayName: 'Deploy ResourceGroups to Azure'
-  dependsOn: Validate
-  condition: succeeded()
-  
-  jobs:
-  - job: DeployInfra
-    steps:
-    - checkout: self
+    jobs:
+      - job: DeployInfra
+        steps:
+          - checkout: self
 
-    - task: AzurePowerShell@5
-      displayName: 'Check if RG exists if not Deploy'
-      inputs:
-        azureSubscription: 'FOTS-infra-SC'
-        ScriptType: 'InlineScript'
-        Inline: |
-          $env = '${{ parameters.environment }}'
-          $jsonPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceGroups.json"
-          $rgs = Get-Content $jsonPath | ConvertFrom-Json
+          - task: AzurePowerShell@5
+            displayName: "Check if RG exists if not Deploy"
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              ScriptType: "InlineScript"
+              Inline: |
+                $env = '${{ parameters.environment }}'
+                $jsonPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceGroups.json"
+                $rgs = Get-Content $jsonPath | ConvertFrom-Json
 
-          foreach ($rg in $rgs) {
-            $rgName = $rg.name
-            $location = $rg.location
+                foreach ($rg in $rgs) {
+                  $rgName = $rg.name
+                  $location = $rg.location
 
-            Write-Host "Processing RG '$rgName' in $location..."
-            $existing = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
+                  Write-Host "Processing RG '$rgName' in $location..."
+                  $existing = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
 
-            if (-not $existing) {
-              New-AzResourceGroup -Name $rgName -Location $location -Tag @{ Creation = 'IaC' }
-              Write-Host "Created resource group: $rgName"
-            }
-            else {
-              Write-Host "Already exists: $rgName"
-            }
-          }
-        azurePowerShellVersion: 'LatestVersion'
+                  if (-not $existing) {
+                    New-AzResourceGroup -Name $rgName -Location $location -Tag @{ Creation = 'IaC' }
+                    Write-Host "Created resource group: $rgName"
+                  }
+                  else {
+                    Write-Host "Already exists: $rgName"
+                  }
+                }
+              azurePowerShellVersion: "LatestVersion"
 
+  - stage: DeployResources
+    displayName: "Deploy resources into Resource Groups"
+    dependsOn: DeployRG
+    condition: succeeded()
+
+    jobs:
+      - job: DeployToRGs
+        displayName: "Deploy resources to all RGs"
+        steps:
+          - checkout: self
