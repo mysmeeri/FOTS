@@ -25,53 +25,53 @@ stages:
     - script: echo "Validation would happen here if I had more time"
       displayName: "Skip validation (for now)"
 
-- stage: Deploy
+- stage: DeployRG
   displayName: 'Deploy ResourceGroups to Azure'
   dependsOn: Validate
   condition: succeeded()
   
-  variables:
-  - ${{ if eq(parameters.environment, 'dev') }}:
-    - template: ../infra/variables/dev/infra-variables.yml
-  - ${{ if eq(parameters.environment, 'test') }}:
-    - template: ../infra/variables/test/infra-variables.yml
-  - ${{ if eq(parameters.environment, 'prod') }}:
-    - template: ../infra/variables/prod/infra-variables.yml
-
   jobs:
   - job: DeployInfra
     steps:
     - checkout: self
 
-    - task: PowerShell@2
-      displayName: 'Loading parameters...'
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "RG Name: $(resourceGroup)"
-          Write-Host "Location: $(location)"
-
     - task: AzurePowerShell@5
-      displayName: 'Tsekataan if RG exists if not Deploy'
+      displayName: 'Check if RG exists if not Deploy'
       inputs:
         azureSubscription: 'FOTS-infra-SC'
         ScriptType: 'InlineScript'
         Inline: |
-          $rgName = "$(resourceGroup)"
-          $location = "$(location)"
+          $env = '${{ parameters.environment }}'
+          $jsonPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceGroups.json"
+          $rgs = Get-Content $jsonPath | ConvertFrom-Json
 
+          foreach ($rg in $rgs) {
+            $rgName = $rg.name
+            $location = $rg.location
 
-          Write-Host "Checking if RG '$rgName' exists..."
+            Write-Host "Processing RG '$rgName' in $location..."
+            $existing = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
 
-          $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
-
-          if ($rg) {
-            Write-Host "Resource group '$rgName' already exists. Skipping creation."
+            if (-not $existing) {
+              New-AzResourceGroup -Name $rgName -Location $location -Tag @{ Creation = 'IaC' }
+              Write-Host "Created resource group: $rgName"
+            }
+            else {
+              Write-Host "Already exists: $rgName"
+            }
           }
-           else {
-            Write-Host "Creating resource group '$rgName'..."
-            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
-              Creation = 'IaC'
-              }
-          }
-        AzurePowerShellVersion: 'LatestVersion'
+        azurePowerShellVersion: 'LatestVersion'
+
+  - stage: Deploy Resources 
+    display name: Deploy Resources
+
+    jobs: 
+    - job: Deploy into Resourcegroups
+    steps: 
+    - checkout: self
+
+    -task: AzurePowerShell@5
+    displayName: 'PlaceHolder'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Write-Host "TESTETSTETTETSTETS"

@@ -1,3 +1,6 @@
 variables:
-  resourceGroup: 'demo-rg'
-  location: 'westeurope'
+  resourceGroups:
+  - name: 'demo-rg'
+    location: 'westeurope'
+  - name: 'FOTS-app-dev-rg'
+    location: 'westeurope'
