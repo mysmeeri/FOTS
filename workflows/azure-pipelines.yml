@@ -62,16 +62,16 @@ stages:
           }
         azurePowerShellVersion: 'LatestVersion'
 
-  - stage: Deploy Resources 
-    display name: Deploy Resources
+- stage: Deploy Resources 
+  display name: Deploy Resources
 
-    jobs: 
-    - job: Deploy into Resourcegroups
-    steps: 
-    - checkout: self
+  jobs: 
+  - job: Deploy into Resourcegroups
+  steps: 
+  - checkout: self
 
-    -task: AzurePowerShell@5
-    displayName: 'PlaceHolder'
-    ScriptType: 'InlineScript'
-    Inline: |
-      Write-Host "TESTETSTETTETSTETS"
+  -task: AzurePowerShell@5
+  displayName: 'PlaceHolder'
+  ScriptType: 'InlineScript'
+  Inline: |
+    Write-Host "TESTETSTETTETSTETS"
