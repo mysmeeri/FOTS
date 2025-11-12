@@ -1,77 +1,46 @@
 trigger: none
 
 parameters:
-- name: environment
-  displayName: 'Select env'
-  type: string
-  default: dev
-  values:
-    - dev
-    - test
-    - prod
-
-
-pool: 
-  name: Default 
-
-stages: 
-- stage: Validate
-  displayName: "Validate"
-  jobs:
-  - job: ValidateInfra
-    displayName: "Placeholder for validation logic"
-    steps:
-    - checkout: self
-    - script: echo "Validation would happen here if I had more time"
-      displayName: "Skip validation (for now)"
-
-- stage: Deploy
-  displayName: 'Deploy Infrastructure to Azure'
-  dependsOn: Validate
-  condition: succeeded()
+  - name: environment
+    displayName: "Select env"
+    type: string
+    default: dev
+    values:
+      - dev
+      - test
+      - prod
   
-  variables:
-  - ${{ if eq(parameters.environment, 'dev') }}:
-    - template: ../infra/variables/dev/infra-variables.yml
-  - ${{ if eq(parameters.environment, 'test') }}:
-    - template: ../infra/variables/test/infra-variables.yml
-  - ${{ if eq(parameters.environment, 'prod') }}:
-    - template: ../infra/variables/prod/infra-variables.yml
 
-  jobs:
-  - job: DeployInfra
-    steps:
-    - checkout: self
+pool:
+  name: Default
 
-    - task: PowerShell@2
-      displayName: 'Loading parameters...'
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "RG Name: $(resourceGroup)"
-          Write-Host "Location: $(location)"
+stages:
+  - stage: Validate
+    displayName: "Validate"
+    jobs:
+      - job: ValidateInfra
+        displayName: "Placeholder for validation logic"
+        steps:
+          - checkout: self
+          - script: echo "Validation would happen here if I had more time"
+            displayName: "Skip validation (for now)"
 
-    - task: AzurePowerShell@5
-      displayName: 'Tsekataan if RG exists if not Deploy'
-      inputs:
-        azureSubscription: 'FOTS-infra-SC'
-        ScriptType: 'InlineScript'
-        Inline: |
-          $rgName = "$(resourceGroup)"
-          $location = "$(location)"
+  - stage: Deploy
+    displayName: "Deploying Infra to Azure"
+    dependsOn: Validate
+    condition: succeeded()
 
+    jobs:
+      - job: DeployInfra
+        steps:
+          - checkout: self
 
-          Write-Host "Checking if RG '$rgName' exists..."
-
-          $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
-
-          if ($rg) {
-            Write-Host "Resource group '$rgName' already exists. Skipping creation."
-          }
-#           else {
-#            Write-Host "Creating resource group '$rgName'..."
-#            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
-#              Creation = 'IaC'
-#              }
-#          }
-        AzurePowerShellVersion: 'LatestVersion'
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az deployment sub create \
+                  --template-file infra/main.bicep \
+                  --parameters @infra/variables/$(environment)/infra-var.json

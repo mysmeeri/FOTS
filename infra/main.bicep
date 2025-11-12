@@ -1,0 +1,22 @@
+param rgName string
+param location string
+param appServicePlanName string
+param sku object
+
+module rgModule './modules/ResourceGroup.bicep' = {
+  name: 'deployRG'
+  params: {
+    rgName: rgName
+    location: location
+  }
+}
+
+/**module aspModule './modules/AppServicePlan.bicep' = {
+  name: 'deployASP'
+  scope: resourceGroup(rgName)
+  params: {
+    appServicePlanName: appServicePlanName
+    location: location
+    sku: sku
+  }
+}*/
