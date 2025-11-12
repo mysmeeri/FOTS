@@ -63,7 +63,7 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
 
 - stage: Deploy Resources 
-  displayName: Deploy Resources
+  displayName: 'Deploy Resources'
   jobs: 
   - job: Deploy into Resourcegroups
     steps: 
