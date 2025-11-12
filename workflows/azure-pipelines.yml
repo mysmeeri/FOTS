@@ -26,7 +26,7 @@ stages:
       displayName: "Skip validation (for now)"
 
 - stage: Deploy
-  displayName: 'Deploy Infrastructure to Azure'
+  displayName: 'Deploy ResourceGroups to Azure'
   dependsOn: Validate
   condition: succeeded()
   
@@ -68,10 +68,10 @@ stages:
           if ($rg) {
             Write-Host "Resource group '$rgName' already exists. Skipping creation."
           }
-#           else {
-#            Write-Host "Creating resource group '$rgName'..."
-#            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
-#              Creation = 'IaC'
-#              }
-#          }
+           else {
+            Write-Host "Creating resource group '$rgName'..."
+            New-AzResourceGroup -Name $rgName -Location $location -Tag @{
+              Creation = 'IaC'
+              }
+          }
         AzurePowerShellVersion: 'LatestVersion'
