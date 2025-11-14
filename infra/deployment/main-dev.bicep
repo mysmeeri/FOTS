@@ -7,7 +7,7 @@ param keyVault object
 // **** demo-rg **** /
 
 // Deploy key vault
-module keyVaultModule './modules/KeyVault.bicep' = {
+module keyVaultModule '../modules/KeyVault.bicep' = {
   name: 'keyVaultDeployment'
   scope: resourceGroup(keyVault.resourceGroup)
   params: {
