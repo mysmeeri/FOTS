@@ -3,6 +3,7 @@
 @description('Key Vault configuration')
 param keyVault object
 
+targetScope = 'subscription'
 
 // **** demo-rg **** /
 
