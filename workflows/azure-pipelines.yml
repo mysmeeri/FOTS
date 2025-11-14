@@ -1,4 +1,9 @@
-trigger: none
+trigger:
+  paths:
+    include:
+      - api/** #pipeline triggers automaagisesti jos apiin tehdään muutoksia
+    exclude:
+      - infra/** #inframuutokset deployataan manuaalisesti
 
 parameters:
   - name: environment
@@ -9,6 +14,11 @@ parameters:
       - dev
       - test
       - prod
+
+  - name: deployInfra
+    type: boolean
+    default: false
+    displayName: "Deploy infrastructure?"
 
 pool:
   name: Default
@@ -26,6 +36,7 @@ stages:
 
   - stage: DeployRG
     displayName: "Deploy ResourceGroups to Azure"
+    condition: eq('${{ parameters.deployInfra }}', 'true')
 #    dependsOn: Validate
 #    condition: succeeded()
 
@@ -63,6 +74,7 @@ stages:
 
   - stage: DeployResources
     displayName: "Deploy resources into Resource Groups"
+    condition: eq('${{ parameters.deployInfra }}', 'true')
  #   dependsOn: DeployRG
  #   condition: succeeded()
 
@@ -91,4 +103,19 @@ stages:
                   --template-file $bicepPath `
                   --parameters @$paramPath
 
+
+  - stage: BuildAPI
+    displayName: Build API
+    condition: succeeded()
+    jobs:
+      - job: DeployInfra
+        steps:
+          - checkout: self
+
+          - task: AzurePowerShell@5
+            displayName: "Check if RG exists if not Deploy"
+            inputs:
+              ScriptType: "InlineScript"
+              Inline: |
+                Write-Output "I work!!!"
 

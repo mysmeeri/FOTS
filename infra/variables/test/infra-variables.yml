@@ -1,3 +1,0 @@
-variables: 
-  resourceGroup: "FOTS-test-RG"
-  location: "westeurope"
