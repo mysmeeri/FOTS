@@ -2,7 +2,7 @@
 
 param keyVault object
 param appService object
-param appInsights object
+//param appInsights object
 
 targetScope = 'subscription'
 
