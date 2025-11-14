@@ -77,8 +77,18 @@ stages:
             displayName: "Deploy App Service"
             inputs:
               azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
-              ScriptType: "InlineScript"
-              Inline: |
-                az group create --name myResourceGroup --location "southcentralus" &&
-                az deployment group create --resource-group myResourceGroup --template-file <path-to-template>
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                $env = '${{ parameters.environment }}'
+
+                $bicepPath = "$(System.DefaultWorkingDirectory)/infra/deployment/main.bicep"
+                $paramPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceVariables.json"
+
+                Write-Host "Deploying subscription-level template..."
+                az deployment sub create `
+                  --location westeurope `
+                  --template-file $bicepPath `
+                  --parameters @$paramPath
+
 

@@ -1,31 +1,32 @@
 // **************** PARAMETERS *********************** //
 
-@description('The name of the Web App')
-param webAppName string
+@description('Key Vault configuration')
+param keyVault object
 
-@description('App Service Plan SKU')
-param sku string
-
-@description('Runtime stack for the Web App (Linux)')
-param linuxFxVersion string
-
-@description('Deployment location')
-param location string = resourceGroup().location
 
 // **** demo-rg **** /
 
+// Deploy key vault
+module keyVaultModule './modules/KeyVault.bicep' = {
+  name: 'keyVaultDeployment'
+  scope: resourceGroup(keyVault.resourceGroup)
+  params: {
+    config: keyVault
+  }
+}
 
 
 
 // **** FOTS-app-dev-rg **** /
 
-
+/*
 module appService '../modules/AppServiceForPython.bicep' = {
   name: 'deployAppService'
   params: {
-    webAppName: webAppName
-    sku: sku
-    linuxFxVersion: linuxFxVersion
-    location: location
+    webAppName: appService.name
+    sku: appService.sku
+    linuxFxVersion: appService.linuxFxVersion
+    location: appService.location
   }
 }
+*/
