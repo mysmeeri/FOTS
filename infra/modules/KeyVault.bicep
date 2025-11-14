@@ -7,7 +7,7 @@ var skuName = config.sku
 var enabledForDeployment = config.enabledForDeployment
 var enabledForDiskEncryption = config.enabledForDiskEncryption
 var enabledForTemplateDeployment = config.enabledForTemplateDeployment
-var tenantId = config.tenantId ?? subscription().tenantId
+
 
 
 resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
@@ -17,7 +17,7 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enabledForDeployment: enabledForDeployment
     enabledForDiskEncryption: enabledForDiskEncryption
     enabledForTemplateDeployment: enabledForTemplateDeployment
-    tenantId: tenantId
+    tenantId: '87879f2e-7304-4bf2-baf2-63e7f83f3c34' //tämän voisi parametrisoida
     enableSoftDelete: true
     softDeleteRetentionInDays: 90
     accessPolicies: []
