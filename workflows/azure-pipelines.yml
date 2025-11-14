@@ -26,8 +26,8 @@ stages:
 
   - stage: DeployRG
     displayName: "Deploy ResourceGroups to Azure"
-    dependsOn: Validate
-    condition: succeeded()
+#    dependsOn: Validate
+#    condition: succeeded()
 
     jobs:
       - job: DeployInfra
@@ -37,7 +37,7 @@ stages:
           - task: AzurePowerShell@5
             displayName: "Check if RG exists if not Deploy"
             inputs:
-              azureSubscription: "FOTS-infra-SC"
+              azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
               ScriptType: "InlineScript"
               Inline: |
                 $env = '${{ parameters.environment }}'
@@ -63,11 +63,32 @@ stages:
 
   - stage: DeployResources
     displayName: "Deploy resources into Resource Groups"
-    dependsOn: DeployRG
-    condition: succeeded()
+ #   dependsOn: DeployRG
+ #   condition: succeeded()
 
     jobs:
       - job: DeployToRGs
         displayName: "Deploy resources to all RGs"
         steps:
           - checkout: self
+
+          
+          - task: AzureCLI@2
+            displayName: "Deploy Resources"
+            inputs:
+              azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
+              scriptType: "ps"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                $env = '${{ parameters.environment }}'
+
+                $bicepPath = "$(System.DefaultWorkingDirectory)/infra/deployment/main-$env.bicep"
+                $paramPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceVariables.json"
+
+                Write-Host "Deploying subscription-level template..."
+                az deployment sub create `
+                  --location westeurope `
+                  --template-file $bicepPath `
+                  --parameters @$paramPath
+
+
