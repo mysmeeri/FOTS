@@ -72,12 +72,12 @@ stages:
         steps:
           - checkout: self
 
-          #pseudokoodia
-          - task: ACLI
+          
+          - task: AzureCLI@2
             displayName: "Deploy App Service"
             inputs:
               azureSubscription: "FOTS-infra-SC" # TO DO tämän voisi parametrisoida
-              scriptType: "pscore"
+              scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
                 $env = '${{ parameters.environment }}'
