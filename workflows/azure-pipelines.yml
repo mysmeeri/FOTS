@@ -108,7 +108,7 @@ stages:
     displayName: Build API
     condition: succeeded()
     jobs:
-      - job: DeployInfra
+      - job: BuildAPI
         steps:
           - checkout: self
 
