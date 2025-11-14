@@ -2,7 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-
     "keyVault": {
       "value": {
         "name": "fots-demo-kv",
@@ -14,6 +13,22 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": false
       }
-    }
+    },
+    "appService": {
+      "value": {
+        "resourceGroup": "FOTS-app-dev-rg",
+        "name": "FOTS-app-dev-as",
+        "location": "westeurope",
+        "sku": "F1",
+        "linuxFxVersion": "python|3.10"
+      }
+    }/*,
+    "appInsights": {
+      "value": {
+        "resourceGroup": "FOTS-app-dev-rg",
+        "name": "FOTS-app-dev-ai",
+        "location": "westeurope"
+      }
+    } */
   }
 }

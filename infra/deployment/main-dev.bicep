@@ -1,13 +1,14 @@
 // **************** PARAMETERS *********************** //
 
-@description('Key Vault configuration')
 param keyVault object
+param appService object
+param appInsights object
 
 targetScope = 'subscription'
 
 // **** demo-rg **** /
 
-// Deploy key vault
+
 module keyVaultModule '../modules/KeyVault.bicep' = {
   name: 'keyVaultDeployment'
   scope: resourceGroup(keyVault.resourceGroup)
@@ -17,17 +18,32 @@ module keyVaultModule '../modules/KeyVault.bicep' = {
 }
 
 
-
 // **** FOTS-app-dev-rg **** /
 
-/*
-module appService '../modules/AppServiceForPython.bicep' = {
-  name: 'deployAppService'
+
+var planName = '${appService.name}-ASP'
+
+module planModule '../modules/AppServicePlanForPython.bicep' = {
+  name: 'ASPDeployment'
+  scope: resourceGroup(appService.resourceGroup)
   params: {
-    webAppName: appService.name
-    sku: appService.sku
-    linuxFxVersion: appService.linuxFxVersion
+    name: planName
     location: appService.location
+    sku: appService.sku
   }
 }
-*/
+
+
+module appModule '../modules/AppServiceForPython.bicep' = {
+  name: 'appServiceDeployment'
+  scope: resourceGroup(appService.resourceGroup)
+  params: {
+    name: appService.name
+    linuxFxVersion: appService.linuxFxVersion
+    location: appService.location
+    ASPplanId: planModule.outputs.id
+  }
+}
+
+
+// TO-DO APP INSIGHTS DEPLOYMENT
