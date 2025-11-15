@@ -119,7 +119,7 @@ stages:
       - job: DeployAPI
         displayName: Deploy API to App Service
         variables:
-         appServiceName: "fots-api-env-as" #TO DO: PARAMETRISOI
+         appServiceName: "fots-api-dev-as" #TO DO: PARAMETRISOI
         steps:
           - checkout: self
 
