@@ -118,7 +118,7 @@ stages:
       - job: DeployAPI
         displayName: Deploy API to App Service
         variables:
-          appServiceName:  appServiceName: "fots-api-${{ parameters.environment }}-as"
+         appServiceName:  appServiceName: "fots-api-env-as" #TO DO: PARAMETRISOI
         steps:
           - checkout: self
 
