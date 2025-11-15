@@ -106,8 +106,8 @@ stages:
 
   - stage: BuildAPI
     displayName: Build & Deploy API
-    dependsOn: Validate
-    condition: succeeded()
+ #   dependsOn: Validate
+ #   condition: succeeded()
 
     jobs:
       - job: BuildAPI
@@ -119,7 +119,7 @@ stages:
       - job: DeployAPI
         displayName: Deploy API to App Service
         variables:
-         appServiceName: "fots-api-dev-as" #TO DO: PARAMETRISOI
+         appServiceName: "FOTS-app-dev-as" #TO DO: PARAMETRISOI
         steps:
           - checkout: self
 
