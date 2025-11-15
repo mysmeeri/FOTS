@@ -105,18 +105,47 @@ stages:
 
 
   - stage: BuildAPI
-    displayName: Build API
+    displayName: Build & Deploy API
     dependsOn: Validate
     condition: succeeded()
+
     jobs:
       - job: BuildAPI
+        displayName: Build Phase
+        steps:
+          - script echo "Tässä pitäisi olla jotain järkevää"
+
+      - job: DeployAPI
+        displayName: Deploy API to App Service
+        variables:
+          appServiceName:  appServiceName: "fots-api-${{ parameters.environment }}-as"
         steps:
           - checkout: self
 
-          - task: AzurePowerShell@5
-            displayName: "Smoketest"
-            inputs:
-              ScriptType: "InlineScript"
-              Inline: |
-                Write-Output "I work!!!"
+          - task: UsePythonVersion@0
+            inputs: 
+              versionSpec: '3.11'
+              addToPath: true
 
+          - script: |
+              cd api
+              python -m venv .venv
+              .venv\Scripts\activate
+              pip install -r requirements.txt
+            displayName: "Installing dependencies"
+
+          - task: ArchiveFiles@2
+            displayName: Zipping the files to deployment
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(Build.ArtifactStagingDirectory)/api.zip"
+              replaceExistingArchive: true
+
+          - task: AzureWebApp@1
+            displayName: "Deploy to App Service"
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              appName: "$(appServiceName)"
+              package: "$(Build.ArtifactStagingDirectory)/api.zip"
