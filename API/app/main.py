@@ -19,3 +19,6 @@ def main(body: dict):
 @app.get("/")
 def root():
     return {"message": "API is running"}
+
+
+#MIKSEI TÄMÄ NÄY ADOSSA
