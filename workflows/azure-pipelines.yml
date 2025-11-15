@@ -113,7 +113,8 @@ stages:
       - job: BuildAPI
         displayName: Build Phase
         steps:
-          - script echo "Tässä pitäisi olla jotain järkevää"
+          - script: "echo 'Tässä pitäisi olla jotain järkevää'"
+            displayName: "Build placeholder"
 
       - job: DeployAPI
         displayName: Deploy API to App Service
