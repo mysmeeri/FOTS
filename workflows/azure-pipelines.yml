@@ -1,9 +1,5 @@
 trigger:
-  paths:
-    include:
-      - api/** #pipeline triggers automaagisesti jos apiin tehdään muutoksia
-    exclude:
-      - infra/** #inframuutokset deployataan manuaalisesti
+  - '*'
 
 parameters:
   - name: environment
@@ -19,6 +15,11 @@ parameters:
     type: boolean
     default: false
     displayName: "Deploy infrastructure?"
+
+  - name: DeployAPI
+    type: boolean
+    default: false
+    displayName: "Deploy API to AppService?"
 
 pool:
   name: Default
@@ -106,8 +107,7 @@ stages:
 
   - stage: BuildAPI
     displayName: Build & Deploy API
- #   dependsOn: Validate
- #   condition: succeeded()
+    condition: eq('${{ parameters.deployApi }}', 'true')
 
     jobs:
       - job: BuildAPI
