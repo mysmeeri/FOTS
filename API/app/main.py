@@ -3,6 +3,19 @@ from .functions import findOptimalSlots
 
 app = FastAPI()
 
+@app.post("/optimize")
+def main(body: dict):
+    participants = body["participants"]
+    meetingName = body["meetingName"]
+
+    result = findOptimalSlots(participants)
+
+    return {
+        "meetingName": meetingName,
+        "optimalSlots": result["optimislotti"],
+        "maxParticipants": result["maxCount"]
+    }
+    
 @app.get("/")
-def main():
-    return findOptimalSlots()
+def root():
+    return {"message": "API is running"}
