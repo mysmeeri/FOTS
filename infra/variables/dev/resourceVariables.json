@@ -22,13 +22,6 @@
         "sku": "B1",
         "linuxFxVersion": "python|3.10"
       }
-    }/*,
-    "appInsights": {
-      "value": {
-        "resourceGroup": "FOTS-app-dev-rg",
-        "name": "FOTS-app-dev-ai",
-        "location": "westeurope"
-      }
-    } */
+    }
   }
 }
