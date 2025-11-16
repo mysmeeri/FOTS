@@ -143,6 +143,17 @@ stages:
         steps:
           - download: current
             artifact: "api" # look! here is the artifact
+          - task: PowerShell@2
+            displayName: "Load resource variables"
+            inputs:
+              targetType: inline
+              script: |
+                $env = '${{ parameters.environment }}'
+                $jsonPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceVariables.json"
+                $data = Get-Content $jsonPath | ConvertFrom-Json
+
+                Write-Host "##vso[task.setvariable variable=appServiceName]$($data.parameters.appService.value.name)"
+                Write-Host "##vso[task.setvariable variable=appServiceRG]$($data.parameters.appService.value.resourceGroup)"
 
           - task: AzureCLI@2
             displayName: "Enable build during deployment"
@@ -151,7 +162,7 @@ stages:
               scriptType: ps
               scriptLocation: inlineScript
               inlineScript: |
-                $resourceGroupName = "$(resourceGroupName)"
+                $resourceGroupName = "$(appServiceRG)"
                 $appServiceName = "$(appServiceName)"
 
                 az webapp config appsettings set `
