@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .functions import findOptimalSlots
+from functions import findOptimalSlots
 
 app = FastAPI()
 
