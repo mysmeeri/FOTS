@@ -19,7 +19,7 @@
         "resourceGroup": "FOTS-app-dev-rg",
         "name": "FOTS-app-dev-as",
         "location": "westeurope",
-        "sku": "F1",
+        "sku": "B1",
         "linuxFxVersion": "python|3.10"
       }
     }/*,
