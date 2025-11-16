@@ -138,6 +138,7 @@ stages:
 
       - job: DeployAPI
         displayName: Deploy API to App Service
+        dependsOn: BuildAPI
         variables:
          appServiceName: "FOTS-app-dev-as" #TO DO: PARAMETRISOI
         steps:
