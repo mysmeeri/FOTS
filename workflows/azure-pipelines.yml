@@ -1,9 +1,5 @@
 trigger:
-  paths:
-    include:
-      - api/** #pipeline triggers automaagisesti jos apiin tehdään muutoksia
-    exclude:
-      - infra/** #inframuutokset deployataan manuaalisesti
+  - '*'
 
 parameters:
   - name: environment
@@ -19,6 +15,11 @@ parameters:
     type: boolean
     default: false
     displayName: "Deploy infrastructure?"
+
+  - name: DeployAPI
+    type: boolean
+    default: false
+    displayName: "Deploy API to AppService?"
 
 pool:
   name: Default
@@ -105,18 +106,75 @@ stages:
 
 
   - stage: BuildAPI
-    displayName: Build API
-    dependsOn: Validate
-    condition: succeeded()
+    displayName: "Build API"
+    condition: eq('${{ parameters.deployApi }}', 'true')
+
     jobs:
       - job: BuildAPI
+        displayName: "Build Phase"
         steps:
           - checkout: self
 
-          - task: AzurePowerShell@5
-            displayName: "Smoketest"
-            inputs:
-              ScriptType: "InlineScript"
-              Inline: |
-                Write-Output "I work!!!"
+          
+          - script: echo "Run tests here..."
+            displayName: "Test placeholder"
+          
+          - script: echo "Run linting here... Whatever that means"
+            displayName: "Lint placeholder"
 
+          
+          - task: ArchiveFiles@2
+            displayName: "Package API into ZIP"
+            inputs:
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api/app"
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(Build.ArtifactStagingDirectory)/api.zip"
+              replaceExistingArchive: true
+
+          # this publishes the zip as an artifact so we can use it in the next phase
+          - publish: "$(Build.ArtifactStagingDirectory)/api.zip"
+            artifact: "api"
+
+      - job: DeployAPI
+        displayName: Deploy API to App Service
+        dependsOn: BuildAPI
+        variables:
+         appServiceName: "FOTS-app-dev-as" #TO DO: PARAMETRISOI
+        steps:
+          - download: current
+            artifact: "api" # look! here is the artifact
+          - task: PowerShell@2
+            displayName: "Load resource variables"
+            inputs:
+              targetType: inline
+              script: |
+                $env = '${{ parameters.environment }}'
+                $jsonPath = "$(System.DefaultWorkingDirectory)/infra/variables/$env/resourceVariables.json"
+                $data = Get-Content $jsonPath | ConvertFrom-Json
+
+                Write-Host "##vso[task.setvariable variable=appServiceName]$($data.parameters.appService.value.name)"
+                Write-Host "##vso[task.setvariable variable=appServiceRG]$($data.parameters.appService.value.resourceGroup)"
+
+          - task: AzureCLI@2
+            displayName: "Enable build during deployment"
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              scriptType: ps
+              scriptLocation: inlineScript
+              inlineScript: |
+                $resourceGroupName = "$(appServiceRG)"
+                $appServiceName = "$(appServiceName)"
+
+                az webapp config appsettings set `
+                  --resource-group $resourceGroupName `
+                  --name $appServiceName `
+                  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+          
+          - task: AzureWebApp@1
+            displayName: "Deploy ZIP package"
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              appName: "$(appServiceName)"
+              package: "$(Pipeline.Workspace)/api/api.zip"

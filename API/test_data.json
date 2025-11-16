@@ -1,0 +1,27 @@
+{
+  "meetingName": "Design Sync",
+  "participants": [
+    {
+      "name": "Alice",
+      "preferredSlots": [
+        "2024-06-10T09:00",
+        "2024-06-10T10:00",
+        "2024-06-10T13:00"
+      ]
+    },
+    {
+      "name": "Bob",
+      "preferredSlots": [
+        "2024-06-10T10:00",
+        "2024-06-10T13:00"
+      ]
+    },
+    {
+      "name": "Carol",
+      "preferredSlots": [
+        "2024-06-10T09:00",
+        "2024-06-10T10:00"
+      ]
+    }
+  ]
+}
