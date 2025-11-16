@@ -106,37 +106,25 @@ stages:
 
 
   - stage: BuildAPI
-    displayName: Build & Deploy API
+    displayName: "Build API"
     condition: eq('${{ parameters.deployApi }}', 'true')
 
     jobs:
       - job: BuildAPI
-        displayName: Build Phase
-        steps:
-          - script: "echo 'Tässä pitäisi olla jotain järkevää'"
-            displayName: "Build placeholder"
-
-      - job: DeployAPI
-        displayName: Deploy API to App Service
-        variables:
-         appServiceName: "FOTS-app-dev-as" #TO DO: PARAMETRISOI
+        displayName: "Build Phase"
         steps:
           - checkout: self
 
-          - task: UsePythonVersion@0
-            inputs: 
-              versionSpec: '3.11'
-              addToPath: true
+          
+          - script: echo "Run tests here..."
+            displayName: "Test placeholder"
+          
+          - script: echo "Run linting here... Whatever that means"
+            displayName: "Lint placeholder"
 
-          - script: |
-              cd api
-              python -m venv .venv
-              .venv\Scripts\activate
-              pip install -r requirements.txt
-            displayName: "Installing dependencies"
-
+          
           - task: ArchiveFiles@2
-            displayName: Zipping the files to deployment
+            displayName: "Package API into ZIP"
             inputs:
               rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api"
               includeRootFolder: false
@@ -144,9 +132,37 @@ stages:
               archiveFile: "$(Build.ArtifactStagingDirectory)/api.zip"
               replaceExistingArchive: true
 
+          # this publishes the zip as an artifact so we can use it in the next phase
+          - publish: "$(Build.ArtifactStagingDirectory)/api.zip"
+            artifact: "api"
+
+      - job: DeployAPI
+        displayName: Deploy API to App Service
+        variables:
+         appServiceName: "FOTS-app-dev-as" #TO DO: PARAMETRISOI
+        steps:
+          - download: current
+            artifact: "api" # look! here is the artifact
+
+          - task: AzureCLI@2
+            displayName: "Enable build during deployment"
+            inputs:
+              azureSubscription: "FOTS-infra-SC"
+              scriptType: ps
+              scriptLocation: inlineScript
+              inlineScript: |
+                $resourceGroupName = "$(resourceGroupName)"
+                $appServiceName = "$(appServiceName)"
+
+                az webapp config appsettings set `
+                  --resource-group $resourceGroupName `
+                  --name $appServiceName `
+                  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+          
           - task: AzureWebApp@1
-            displayName: "Deploy to App Service"
+            displayName: "Deploy ZIP package"
             inputs:
               azureSubscription: "FOTS-infra-SC"
               appName: "$(appServiceName)"
-              package: "$(Build.ArtifactStagingDirectory)/api.zip"
+              package: "$(Pipeline.Workspace)/api/api.zip"

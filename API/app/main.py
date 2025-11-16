@@ -21,4 +21,4 @@ def root():
     return {"message": "API is running"}
 
 
-#MIKSEI TÄMÄ NÄY ADOSSA
+#MIKSEI TÄMÄ NÄY ADOSSA --> oLINKIN VAIN SOKEA
