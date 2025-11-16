@@ -126,7 +126,7 @@ stages:
           - task: ArchiveFiles@2
             displayName: "Package API into ZIP"
             inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api"
+              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/api/app"
               includeRootFolder: false
               archiveType: zip
               archiveFile: "$(Build.ArtifactStagingDirectory)/api.zip"
