@@ -7,7 +7,7 @@ python -m venv .venv
 .\.venv\Scripts\activate
 
 # install dependencies
-pip install -r requirements.txt
+pip install -r API/app/requirements.txt
 
 # start api
 uvicorn app.main:app --reload in the terminal
