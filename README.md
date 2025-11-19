@@ -58,14 +58,12 @@ python -m venv .venv
 pip install -r API/app/requirements.txt
 
 #### start api
-uvicorn app.main:app --reload in the terminal
+cd api/app
+uvicorn main:app --reload
 
-#### test in powershell (windows machines)
-Invoke-RestMethod `
-  -Uri http://localhost:8000/optimize `
-  -Method POST `
-  -ContentType "application/json" `
-  -InFile .\api\test_data.json `
+
+#### test in powershell (windows machines), run in the same location where the project is located
+Invoke-RestMethod -Uri http://localhost:8000/optimize -Method POST -ContentType "application/json" -InFile .\api\test_data.json | ConvertTo-Json -Depth 5
 
 --> output will be presented like this:
 
