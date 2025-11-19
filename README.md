@@ -17,9 +17,13 @@ Service Connection (can be created in ADO) with Contributor right to subcription
 
 #### 2. Azure DevOps SetUp
 Create a Service Connection
+
 Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
+
 Authentication: Service Principal (automatic)
+
 Name it: FOTS-infra-SC (in this project)
+
  --> Gives it automatically contributor to subscription scope
 
 Give the SC pipeline access
@@ -40,8 +44,11 @@ git push origin <branch>
 
 ### Pipeline Parameters
 Parameter	Description	Default
+
 Environment ->	Target environment -> (dev, test, or prod)	default dev
+
 DeployInfra ->	Whether to deploy infrastructure -> default	false
+
 DeployAPI	-> Whether to build and deploy the API to App Service -> default	false
 
 ### Pipeline Stages
@@ -53,18 +60,25 @@ Creates resource groups if they don’t already exist (based on resourceGroups.j
 
 #### 3. DeployResources
 Deploys Azure resources (App Service, Storage, etc.) using Bicep templates and parameters from resourceVariables.json.
+
 -> Right now the basic pipeline deploys only KeyVault, ASP and AppService
 
 #### 4. BuildAPI
 Runs optional lint/tests (only placeholder).
+
 Packages FastAPI app into a ZIP file (api.zip).
+
 Publishes the ZIP as a pipeline artifact.
 
 #### 5. DeployAPI
 Downloads the build artifact.
+
 Loads resource variables for the selected environment.
+
 Enables App Service build during deployment.
+
 Configures the startup command
+
 Deploys the API ZIP to the target Azure App Service.
 
 ## Checking the API after deployment:
@@ -107,5 +121,7 @@ Invoke-RestMethod -Uri http://localhost:8000/optimize -Method POST -ContentType 
 
 #### test in Swagger UI in browser
 Root endpoint: http://localhost:8000/docs
+
 Open the endpoint and open the /post/optimize, there you can also test by copying the test_data.json into the field
+
 You should get similar results to the powershell test
