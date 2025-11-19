@@ -1,6 +1,5 @@
-# Python virtual environments
+# Python virtual environments etc.
 .venv/
 venv/
 API/app/__pycache__
 API/runtest.py 
-API/test_data.json
