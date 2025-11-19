@@ -12,24 +12,24 @@ The deployment process is automated via Azure DevOps using azure-pipelines.yml.
 
 ### Infrastructure Set Up
 #### 1. Azure Resources Needed
-- Subscription
-- Service Connection (can be created in ADO) with Contributor right to subcription
+Subscription
+Service Connection (can be created in ADO) with Contributor right to subcription
 
 #### 2. Azure DevOps SetUp
-- Create a Service Connection
-- Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
-- Authentication: Service Principal (automatic)
-- Name it: FOTS-infra-SC (in this project)
-- --> Gives it automatically contributor to subscription scope
+Create a Service Connection
+Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
+Authentication: Service Principal (automatic)
+Name it: FOTS-infra-SC (in this project)
+ --> Gives it automatically contributor to subscription scope
 
-- Give the SC pipeline access
-- Check “Grant access permission to all pipelines” or to the pipeline you are running
+Give the SC pipeline access
+Check “Grant access permission to all pipelines” or to the pipeline you are running
 
 ### How to Push Changes
 #### 1. Push to Azure DevOps (main CI/CD pipeline)
-- git add .
-- git commit -m "your message"
-- git push origin master
+git add .
+git commit -m "your message"
+git push origin master
 
 #### 2. Push to GitHub (public repo copy)
 git push github master
@@ -45,22 +45,22 @@ DeployInfra ->	Whether to deploy infrastructure -> default	false
 DeployAPI	-> Whether to build and deploy the API to App Service -> default	false
 
 ### Pipeline Stages
-1. Validate
+#### 1. Validate
 Placeholder for validation and pre-deployment checks.
 
-2. DeployRG
+#### 2. DeployRG
 Creates resource groups if they don’t already exist (based on resourceGroups.json).
 
-3. DeployResources
+#### 3. DeployResources
 Deploys Azure resources (App Service, Storage, etc.) using Bicep templates and parameters from resourceVariables.json.
 -> Right now the basic pipeline deploys only KeyVault, ASP and AppService
 
-4. BuildAPI
+#### 4. BuildAPI
 Runs optional lint/tests (only placeholder).
 Packages FastAPI app into a ZIP file (api.zip).
 Publishes the ZIP as a pipeline artifact.
 
-5. DeployAPI
+#### 5. DeployAPI
 Downloads the build artifact.
 Loads resource variables for the selected environment.
 Enables App Service build during deployment.
