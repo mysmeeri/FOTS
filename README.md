@@ -11,11 +11,11 @@ Python, YML, Bicep, JSON
 The deployment process is automated via Azure DevOps using azure-pipelines.yml.
 
 ### Infrastructure Set Up
-1. Azure Resources Needed
+#### 1. Azure Resources Needed
 - Subscription
 - Service Connection (can be created in ADO) with Contributor right to subcription
 
-2. Azure DevOps SetUp
+#### 2. Azure DevOps SetUp
 - Create a Service Connection
 - Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
 - Authentication: Service Principal (automatic)
@@ -26,15 +26,15 @@ The deployment process is automated via Azure DevOps using azure-pipelines.yml.
 - Check “Grant access permission to all pipelines” or to the pipeline you are running
 
 ### How to Push Changes
-1. Push to Azure DevOps (main CI/CD pipeline)
+#### 1. Push to Azure DevOps (main CI/CD pipeline)
 - git add .
 - git commit -m "your message"
 - git push origin master
 
-2. Push to GitHub (public repo copy)
+#### 2. Push to GitHub (public repo copy)
 git push github master
 
-3. Push branches (optional)
+#### 3. Push branches (optional)
 git push github <branch>
 git push origin <branch>
 
