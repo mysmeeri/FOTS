@@ -159,7 +159,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Enable build during deployment"
             inputs:
-              azureSubscription: "FOTS-infra-SC"
+              azureSubscription: "FOTS-infra-SC" #TO DO: PARAMETRISOI
               scriptType: ps
               scriptLocation: inlineScript
               inlineScript: |
@@ -170,6 +170,22 @@ stages:
                   --resource-group $resourceGroupName `
                   --name $appServiceName `
                   --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+          - task: AzureCLI@2
+            displayName: "Configure startup command"
+            inputs:
+              azureSubscription: "FOTS-infra-SC" #TO DO: PARAMETRISOI
+              scriptType: ps
+              scriptLocation: inlineScript
+              inlineScript: |
+                $resourceGroupName = "$(appServiceRG)"
+                $appServiceName = "$(appServiceName)"
+                $startupCommand = "uvicorn main:app --host 0.0.0.0 --port 8000"
+
+                az webapp config set `
+                  --resource-group $resourceGroupName `
+                  --name $appServiceName `
+                  --startup-file $startupCommand
 
           
           - task: AzureWebApp@1

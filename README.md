@@ -1,6 +1,10 @@
-how to run API locally:
 
-powershell terminal:
+
+
+
+How to run and test API locally:
+
+## In powershell terminal:
 
 # creates the environment
 python -m venv .venv
@@ -19,7 +23,7 @@ Invoke-RestMethod `
   -ContentType "application/json" `
   -InFile .\api\test_data.json `
 
---> Output on jotain noin tälläistä
+--> output will be presented like this:
 
 {
   "meetingName": "Design Sync",
@@ -31,3 +35,5 @@ Invoke-RestMethod `
 
 # test in Swagger UI in browser
 Root endpoint: http://localhost:8000/docs
+Open the endpoint and open the /post/optimize, there you can also test by copying the test_data.json into the field
+You should get similar results to the powershell test
