@@ -40,21 +40,27 @@ Deploys the API ZIP to the target Azure App Service.
 ## Checking the API after deployment:
 https://fots-app-dev-as.azurewebsites.net//docs#/default/main_optimize_post
 
-# How to run and test API locally:
 
-## In powershell terminal:
 
-### creates the environment
+----------------------------------------------------------------------
+
+
+
+## How to run and test API locally:
+
+### In powershell terminal:
+
+#### creates the environment
 python -m venv .venv
 .\.venv\Scripts\activate
 
-### install dependencies
+#### install dependencies
 pip install -r API/app/requirements.txt
 
-### start api
+#### start api
 uvicorn app.main:app --reload in the terminal
 
-### test in powershell (windows machines)
+#### test in powershell (windows machines)
 Invoke-RestMethod `
   -Uri http://localhost:8000/optimize `
   -Method POST `
@@ -71,7 +77,7 @@ Invoke-RestMethod `
   "maxParticipants": 3
 }
 
-### test in Swagger UI in browser
+#### test in Swagger UI in browser
 Root endpoint: http://localhost:8000/docs
 Open the endpoint and open the /post/optimize, there you can also test by copying the test_data.json into the field
 You should get similar results to the powershell test

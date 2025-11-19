@@ -46,4 +46,4 @@ module appModule '../modules/AppServiceForPython.bicep' = {
 }
 
 
-// TO-DO APP INSIGHTS DEPLOYMENT
+// TO-DO APP INSIGHTS DEPLOYMENT INTO APP SERVICE RG
