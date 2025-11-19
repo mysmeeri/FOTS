@@ -12,24 +12,24 @@ The deployment process is automated via Azure DevOps using azure-pipelines.yml.
 
 ### Infrastructure Set Up
 1. Azure Resources Needed
-Subscription
-Service Connection (can be created in ADO) with Contributor right to subcription
+- Subscription
+- Service Connection (can be created in ADO) with Contributor right to subcription
 
 2. Azure DevOps SetUp
-Create a Service Connection
-Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
-Authentication: Service Principal (automatic)
-Name it: FOTS-infra-SC (in this project)
---> Gives it automatically contributor to subscription scope
+- Create a Service Connection
+- Go to: Project Settings → Service Connections → New service connection → Azure Resource Manager
+- Authentication: Service Principal (automatic)
+- Name it: FOTS-infra-SC (in this project)
+- --> Gives it automatically contributor to subscription scope
 
-Give pipeline access
-Check “Grant access permission to all pipelines” or to the pipeline you are running
+- Give the SC pipeline access
+- Check “Grant access permission to all pipelines” or to the pipeline you are running
 
 ### How to Push Changes
 1. Push to Azure DevOps (main CI/CD pipeline)
-git add .
-git commit -m "your message"
-git push origin master
+- git add .
+- git commit -m "your message"
+- git push origin master
 
 2. Push to GitHub (public repo copy)
 git push github master
